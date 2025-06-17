@@ -3,6 +3,10 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics/Image.hpp>
 #include <iostream>
+#include <random>
+
+#include "buttonPanel.h"
+#include "GameManager.h"
 using namespace std;
 
 
@@ -17,9 +21,8 @@ const static int GWIDTH = 850;
 const static int GHEIGHT = 660;
 const static int GX = 20;
 const static int GY = 20;
+const static int FACTOR = 5; //scales down the game to a smaller size
 
-sf::Texture bgtexture(sf::Vector2u{WIDTH, HEIGHT});
-sf::Sprite bgSprite(bgtexture);
 
 
 //registries
@@ -28,9 +31,16 @@ vector<vector<uint8_t>> static pixels; //pixels array
 vector<sf::Texture> static textures; //texture array
 vector<sf::Sprite> static sprites;
 
+//for images and buttons
+string static paths[1] = {"../lib/bg.png"};
+buttonPanel buttons = buttonPanel(890, 50);
+
 
 int main() {
     sf::RenderWindow static window(sf::VideoMode({WIDTH, HEIGHT}), "Dune Sim", sf::Style::Close);
+    GameManager *gm = new GameManager(WIDTH, HEIGHT, FACTOR);
+
+    gm->getBoard();
 
     initGraphics();
     drawScreen(window);
@@ -54,6 +64,8 @@ void drawScreen(sf::RenderWindow &window) {
     for (int i = 0; i<sprites.size(); i++) {
         window.draw(sprites[i]); //loops thru and draws sprites
     }
+    window.draw(buttons.sprite);
+
 }
 
 //===== BASE COLOR SET IN WINDOW FUNCTION =====
@@ -83,6 +95,11 @@ void setSpriteLocation(sf::Sprite &sprite, int x, int y) {
     sprite.setPosition(sf::Vector2f(x, y));
 }
 
+
+
+
+
+
 //====STARTUP FUNCTIONS===
 void initGraphics() {
     //initializing each of the graphic components
@@ -106,20 +123,59 @@ void initGraphics() {
 
     //fills windowviewer
 
+    sf::Image bgPreset(paths[0]);
+    for (int i = 0; i<WIDTH;i++) {
+        for (int j =0;j<HEIGHT;j++) {
+            setGridPixel(0, i, j, WIDTH, HEIGHT, bgPreset.getPixel(sf::Vector2u(i, j)));
+        }
+    }
+
+    for (int i = 16; i<GWIDTH+24; i++) { //fills border
+        for (int j = 16 ; j<GHEIGHT+24; j++) {
+            setGridPixel(0, i, j, WIDTH, HEIGHT, sf::Color(0, 0, 0));
+        }
+    }
+
+    textures[0].update(pixels[0].data());
+    sprites[0].setTexture(textures[0]);
+
+    updateTS(0);
 
     //fills gameviewer
-    // sf::Color sand_options[6] = {sf::Color(202,160,106), sf::Color(134,99,65), sf::Color(71,56,45), sf::Color(187,168,143), sf::Color(122,96,72), sf::Color(146,127,104)};
-    int min[3] = {143,127,105};
+    sf::Color gameViewerPixelated[GWIDTH/FACTOR][GHEIGHT/FACTOR]; //scales the pixels down a bit for display purposes
+
+    int options = 3;
+    sf::Color sand_options[options] = {sf::Color(202,160,106), sf::Color(71,56,45), sf::Color(187,168,143)};
+    int min[3] = {168,152,130};
     int max[3] = {185,166,141};
     int difference[3];
     for (int i = 0; i<3;i++) {
         difference[i] = max[i] - min[i];
     }
 
-    for (int i = 0; i<GWIDTH; i++) {
-        for (int j = 0; j<GHEIGHT; j++) {
-            setGridPixel(1, i, j, GWIDTH, GHEIGHT, sf::Color((min[0] + rand() % difference[0]), (min[1] + rand() % difference[1]), (min[2] + rand() % difference[2])));
+    for (int i = 0; i < GWIDTH/FACTOR; i++) {
+        int r = min[0] + rand() % difference[0];
+        int g = min[1] + rand() % difference[1];
+        int b = min[2] + rand() % difference[2];
+        sand_options[1] = sf::Color(r, g, b);
+        for (int j = 0; j < GHEIGHT/FACTOR; j++) {
+            gameViewerPixelated[i][j] = sf::Color(sand_options[rand()%options]);
         }
     }
+
+
+
+    for (int i = 0; i<GHEIGHT; i++) {
+        for (int j = 0; j<GWIDTH; j++) {
+            setGridPixel(1, j, i, GWIDTH, GHEIGHT, gameViewerPixelated[i/FACTOR][j/FACTOR]);
+        }
+    }
+
     updateTS(1);
+
+
+    //inits and adds buttons
+    int startW = 890;
+    int startH = 100;
+
 }

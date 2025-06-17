@@ -12,6 +12,12 @@ set(CMAKE_CXX_STANDARD 20)
 
 
 add_executable(dune_sim main.cpp
+        GameManager.cpp
+        GameManager.h
+        Sandworm.cpp
+        Sandworm.h
+        buttonPanel.cpp
+        buttonPanel.h
 )
 
 target_link_libraries(dune_sim sfml-graphics)

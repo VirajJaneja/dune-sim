@@ -1,0 +1,17 @@
+1. Create gamemanager class - done
+2. Create board - done
+3. codeify board
+4, implement manager into window
+5. add button textures
+6. make buttons do something
+
+
+rs next steps:
+1. write up game manager cpp file and terrain placement
+2. enable buttons
+3. just get terrain working
+
+Things i shouldnt forget to do:
+-revamp gamemanager sandworm movement and pathing
+
+
