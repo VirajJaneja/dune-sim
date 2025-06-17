@@ -12,23 +12,28 @@ using namespace std;
 class buttonPanel {
 public:
     int placement[2]{};
-    int const width = 70;
+    int const width = 100;
+    int const static buttonCount = 5;
 
-    sf::Image const images[5] = {sf::Image("../lib/sample.png"), //pointer button
+    sf::Image const images[buttonCount] = {sf::Image("../lib/pointer.png"), //pointer button
         sf::Image("../lib/sample.png"), //viewshift button
         sf::Image("../lib/sample.png"), //terain button
         sf::Image("../lib/sample.png"), //thumper button
         sf::Image("../lib/sample.png") //clear terrain button
     };
 
+    bool modes[buttonCount] = {false, false, false, false, false};
+
     string temp = "../lib/sample.png";
 
     sf::Texture texture;
-    vector<vector<uint8_t>> static pixels; //pixels array
+    vector<uint8_t> pixels; //pixels array
     sf::Sprite sprite;
+    sf::Image combinedImage = sf::Image(sf::Vector2u{100, 600}, sf::Color::Transparent);
 
     buttonPanel(int x, int y);
     void initButtons();
+    void loadCombinedImage();
 };
 
 

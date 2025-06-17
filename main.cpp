@@ -33,7 +33,7 @@ vector<sf::Sprite> static sprites;
 
 //for images and buttons
 string static paths[1] = {"../lib/bg.png"};
-buttonPanel buttons = buttonPanel(890, 50);
+buttonPanel buttons = buttonPanel(890, 100);
 
 
 int main() {
