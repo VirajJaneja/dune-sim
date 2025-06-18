@@ -12,17 +12,18 @@ using namespace std;
 class buttonPanel {
 public:
     int placement[2]{};
-    int const width = 100;
+    int const width = 90;
     int const static buttonCount = 5;
 
-    sf::Image const images[buttonCount] = {sf::Image("../lib/pointer.png"), //pointer button
-        sf::Image("../lib/sample.png"), //viewshift button
-        sf::Image("../lib/sample.png"), //terain button
-        sf::Image("../lib/sample.png"), //thumper button
-        sf::Image("../lib/sample.png") //clear terrain button
+
+    sf::Image const images[buttonCount] = {sf::Image("../lib/pointer.png"), //pointer button - 0
+        sf::Image("../lib/sample.png"), //viewshift button - 1
+        sf::Image("../lib/Create_terrain.png"), //terain button - 2
+        sf::Image("../lib/sample.png"), //thumper button - 3
+        sf::Image("../lib/clearTerrain.png") //clear terrain button - 4
     };
 
-    bool modes[buttonCount] = {false, false, false, false, false};
+    int mode = 0;
 
     string temp = "../lib/sample.png";
 
@@ -34,6 +35,8 @@ public:
     buttonPanel(int x, int y);
     void initButtons();
     void loadCombinedImage();
+    void takeInput(int x, int y);
+
 };
 
 

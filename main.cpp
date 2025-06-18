@@ -14,6 +14,8 @@ void drawScreen(sf::RenderWindow &window); //draws the entirety of the sprites o
 void initGraphics(); //initializes the screen on startup
 void setGridPixel(int i, int x, int y, int w, int h, sf::Color color); //used for setting pixel on texture;
 void setGridPixel(vector<uint8_t> customPixels, int x, int y, sf::Color color); //overloaded ^
+void handleButtonClick(sf::Vector2i pos); // handles button clicked
+
 
 const static int WIDTH = 1000;
 const static int HEIGHT = 700;
@@ -50,6 +52,9 @@ int main() {
     while (window.isOpen()) {
         drawScreen(window);
         while (const optional event = window.pollEvent()) {
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                handleButtonClick(sf::Mouse::getPosition(window));
+            }
             if (event->is<sf::Event::Closed>()) {
                 window.close();
             }
@@ -57,6 +62,22 @@ int main() {
         window.display();
     }
 }
+
+
+
+// ========== HANDLES EVENTS ===========
+void handleButtonClick(sf::Vector2i pos) {
+    int x = pos.x;
+    int y = pos.y;
+    cout << x << " " << y << endl;
+
+    if ((x > 890 && x < 890+90) && (y > 100 && y < 600)) {
+
+        buttons.takeInput(x-890, y-100);
+    }
+}
+
+
 
 //DRAWS SPRITES ONTO SCREEN
 void drawScreen(sf::RenderWindow &window) {
@@ -67,6 +88,7 @@ void drawScreen(sf::RenderWindow &window) {
     window.draw(buttons.sprite);
 
 }
+
 
 //===== BASE COLOR SET IN WINDOW FUNCTION =====
 void setGridPixel(int i, int x, int y, int w, int h, sf::Color color) {
@@ -84,6 +106,8 @@ void setGridPixel(vector<uint8_t> customPixels, int x, int y, sf::Color color) {
     customPixels[val+2] = color.b;
     customPixels[val+3] = color.a;
 }
+
+
 
 //====UPDATE SPRITE/TEXTURE=======
 void updateTS(int i) {
