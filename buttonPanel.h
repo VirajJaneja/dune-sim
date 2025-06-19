@@ -35,7 +35,7 @@ public:
     buttonPanel(int x, int y);
     void initButtons();
     void loadCombinedImage();
-    void takeInput(int x, int y);
+    int takeInput(int x, int y);
 
 };
 

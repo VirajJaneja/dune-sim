@@ -54,12 +54,13 @@ void buttonPanel::loadCombinedImage() {
     sprite.setTexture(texture);
 }
 
-void buttonPanel::takeInput(int x, int y) {
+int buttonPanel::takeInput(int x, int y) {
     int check = y%100;
     if (check <= 90) {
         mode = y/100;
     }
     cout << check << endl;
     loadCombinedImage();
+    return mode;
 }
 

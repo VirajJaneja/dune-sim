@@ -13,8 +13,9 @@ using namespace std;
 void drawScreen(sf::RenderWindow &window); //draws the entirety of the sprites onto the creen
 void initGraphics(); //initializes the screen on startup
 void setGridPixel(int i, int x, int y, int w, int h, sf::Color color); //used for setting pixel on texture;
-void setGridPixel(vector<uint8_t> customPixels, int x, int y, sf::Color color); //overloaded ^
-void handleButtonClick(sf::Vector2i pos); // handles button clicked
+void setGridPixel(vector<uint8_t>& customPixels, int x, int y, int width, sf::Color color); //overloaded ^
+int handleButtonClick(sf::Vector2i pos, GameManager *gm); // handles button clicked
+void updateGameViewer(GameManager *gm); //updates gameviewer
 
 
 const static int WIDTH = 1000;
@@ -24,6 +25,9 @@ const static int GHEIGHT = 660;
 const static int GX = 20;
 const static int GY = 20;
 const static int FACTOR = 5; //scales down the game to a smaller size
+static int mode = 0;
+static vector<uint8_t> BASE_GAME_PIXELS;
+static sf::Color boardKey[2] = {sf::Color(0, 0, 0, 0), sf::Color::Black};
 
 
 
@@ -40,7 +44,7 @@ buttonPanel buttons = buttonPanel(890, 100);
 
 int main() {
     sf::RenderWindow static window(sf::VideoMode({WIDTH, HEIGHT}), "Dune Sim", sf::Style::Close);
-    GameManager *gm = new GameManager(WIDTH, HEIGHT, FACTOR);
+    GameManager *gm = new GameManager(GWIDTH, GHEIGHT, FACTOR, 5);
 
     gm->getBoard();
 
@@ -53,7 +57,10 @@ int main() {
         drawScreen(window);
         while (const optional event = window.pollEvent()) {
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                handleButtonClick(sf::Mouse::getPosition(window));
+                int potential = handleButtonClick(sf::Mouse::getPosition(window), gm);
+                if (potential != -1) {
+                    mode = potential;
+                }
             }
             if (event->is<sf::Event::Closed>()) {
                 window.close();
@@ -66,15 +73,37 @@ int main() {
 
 
 // ========== HANDLES EVENTS ===========
-void handleButtonClick(sf::Vector2i pos) {
+int handleButtonClick(sf::Vector2i pos, GameManager *gm) {
     int x = pos.x;
     int y = pos.y;
-    cout << x << " " << y << endl;
 
     if ((x > 890 && x < 890+90) && (y > 100 && y < 600)) {
 
-        buttons.takeInput(x-890, y-100);
+        return buttons.takeInput(x-890, y-100);
     }
+    if ((x < GX+GWIDTH && x > GX) && (y > GY && y<GY+GHEIGHT)) {
+        switch (mode) {
+            case 0:
+                break;
+            case 1:
+                cout << "viewshift" << endl;
+                break;
+            case 2:
+                x = (x - GX)/FACTOR;
+                y = (y - GY)/FACTOR;
+                gm->placeTerrain(x, y);
+                break;
+            case 3:
+                break;
+            case 4:
+                gm->clearTerrain();
+            default:
+                break;
+        }
+        updateGameViewer(gm);
+
+    }
+    return -1;
 }
 
 
@@ -99,8 +128,8 @@ void setGridPixel(int i, int x, int y, int w, int h, sf::Color color) {
     pixels[i][val+3] = color.a;
 }
 
-void setGridPixel(vector<uint8_t> customPixels, int x, int y, sf::Color color) { //overloaded for custom pixelset
-    int val = ((WIDTH*(y))+(x))*4;
+void setGridPixel(vector<uint8_t>& customPixels, int x, int y, int width, sf::Color color) { //overloaded for custom pixelset
+    int val = ((width*(y))+(x))*4;
     customPixels[val] = color.r;
     customPixels[val+1] = color.g;
     customPixels[val+2] = color.b;
@@ -119,7 +148,26 @@ void setSpriteLocation(sf::Sprite &sprite, int x, int y) {
     sprite.setPosition(sf::Vector2f(x, y));
 }
 
+void updateGameViewer(GameManager *gm) {
+    BASE_GAME_PIXELS.clear();
+    for (int i = 0; i<pixels[1].size(); i++) {
+        BASE_GAME_PIXELS.push_back(pixels[1][i]);
+    }
+    vector<vector<int>> board = gm->getBoard();
 
+    for (int i = 0; i<GWIDTH; i++) {
+        for (int j = 0; j<GHEIGHT; j++) {
+            int val = board[i/FACTOR][j/FACTOR];
+            if (val != 0) {
+                setGridPixel(BASE_GAME_PIXELS, i, j, GWIDTH, boardKey[val]);
+            }
+        }
+    }
+
+    textures[1].update(BASE_GAME_PIXELS.data());
+    sprites[1].setTexture(textures[1]);
+
+}
 
 
 
